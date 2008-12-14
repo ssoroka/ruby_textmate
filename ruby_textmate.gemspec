@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Steven Soroka"]
-  s.date = %q{2008-12-12}
+  s.date = %q{2008-12-14}
   s.description = %q{a ruby interface to textmate}
   s.email = %q{ssoroka78@gmail.com}
   s.extra_rdoc_files = ["lib/ruby_textmate.rb"]
