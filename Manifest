@@ -1,4 +1,7 @@
+init.rb
 lib/ruby_textmate.rb
 Manifest
 Rakefile
+README
 ruby_textmate.gemspec
+test/ruby_textmate_test.rb

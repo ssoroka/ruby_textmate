@@ -1,41 +1,67 @@
 require 'tempfile'
+require 'net/http'
+require 'net/https'
+require 'net/ftp'
+require 'open-uri'
+require 'open3'
+
 class RubyTextmate
   class <<self
     def open(thing, options = {})
-      if thing && thing !~ /[\s]/ && File.exist?(thing)
-        open_file(thing, options)
-      else
-        open_text(thing, options)
+      if thing
+        if thing =~ /^http\:\/\//i
+          open_url(thing, options)
+        elsif thing !~ /[\s]/ && File.exist?(thing)
+          open_file(thing, options)
+        else
+          open_text(thing, options)
+        end
       end
     end
 
-    # acceptable options are:
-    #  :async            Do not wait for file to be closed by TextMate.
-    #  :wait             Wait for file to be closed by TextMate.
-    #  :line => <number> Place caret on line <number> after loading file.
-    #  :recent           Add file to Open Recent menu.
-    #  :change_dir       Change TextMates working directory to that of the file.
-    #  :no_reactivation  After edit :wait, do not re-activate the calling app.
     def open_file(filename, options = {})
-      mate_options = []
-      mate_options << '-w' if options[:wait]
-      mate_options << '-a' if options[:async]
-      mate_options << "-l #{options[:line]}" if options[:line]
-      mate_options << '-r' if options[:recent]
-      mate_options << '-d' if options[:change_dir]
-      mate_options << '-n' if options[:no_reactivation]
+      mate_options = build_mate_options(options)
       mate_options << filename
       system("mate", *mate_options)
     end
 
-    def open_text(text, options = {})
+    def with_tempfile(init_text, options = {})
       t = Tempfile.open('textmate')
       filename = t.path
-      t.write(text)
+      t.write(init_text)
       t.close
-      open_file(filename, options)
+      open_file(filename, options.merge(:wait => true))
+      t.open
+      result = t.read
+      t.close
       t.delete
-      filename
+      result
     end
+    
+    def open_text(text, options = {})
+      Open3.popen3("mate #{build_mate_options(options).join(' ')}") do |stdin, stdout, stderr|
+        stdin.write(text)
+        stdin.close_write
+        stdout.read if options[:wait]
+      end
+    end
+    
+    def open_url(url, options = {})
+      Kernel.open(url) do |f|
+        open_text(f.read, options)
+      end
+    end
+
+    private
+      def build_mate_options(options)
+        mate_options = []
+        mate_options << '-w' if options[:wait]
+        mate_options << '-a' if options[:async]
+        mate_options << "-l #{options[:line]}" if options[:line]
+        mate_options << '-r' if options[:recent]
+        mate_options << '-d' if options[:change_dir]
+        mate_options << '-n' if options[:no_reactivation]
+        mate_options
+      end
   end
 end

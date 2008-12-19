@@ -1,0 +1,35 @@
+= Ruby Textmate
+
+A ruby interface to passing text to textmate.  This is not necessarily an api for textmate as much as an easy way to interface with it from code and pass it text.
+
+== Installation
+
+  sudo gem install ssoroka-ruby_textmate
+  
+or to install it as plugin:
+  
+  script/plugin install git://github.com/ssoroka/ruby_textmate.git
+
+== Usage
+
+  RubyTextmate.open_text("blah blah blah", options)
+  RubyTextmate.open_file('~/.bash_login', options)
+  RubyTextmate.open_url("http://gist.github.com/raw/24825/64ab18a92caa7329a36cfbe68671a8cc10acc225", options)
+  
+and this one is interesting...
+  
+  RubyTextmate.with_tempfile('some text') #=> opens textmate with a temp file having contents of 'some text', method returns temp file contents when the user saves and closes textmate, and deletes the temp file for you.
+  
+or try your luck with:
+
+  RubyTextmate.open()
+  
+and it'll try to guess what you're attempting to open and call the right method for you.
+
+  acceptable options are:
+   :async            Do not wait for file to be closed by TextMate (default).
+   :wait             Wait for file to be closed by TextMate.
+   :line => <number> Place caret on line <number> after loading file.
+   :recent           Add file to Open Recent menu.
+   :change_dir       Change TextMates working directory to that of the file (only for open_file).
+   :no_reactivation  After edit :wait, do not re-activate the calling app (may not work).

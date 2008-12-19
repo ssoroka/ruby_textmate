@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'echoe'
 
-Echoe.new('ruby_textmate', '0.1.1') do |p|
+Echoe.new('ruby_textmate', '1.0.0') do |p|
   p.description = 'a ruby interface to textmate'
   p.url = 'http://github.com/ssoroka/ruby_textmate'
   p.author = 'Steven Soroka'
